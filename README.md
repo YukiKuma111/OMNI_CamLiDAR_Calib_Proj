@@ -84,7 +84,13 @@ This project provides tools for projecting 3D point cloud data onto 2D image pla
 
     - `-s`: Path to save the output projection image (e.g., `~/output/projection.png`).
 
-2. `auto_projection.py`
+2. `omni_one_img_projection.py`
+
+    **Functionality:**
+
+    'Omni' means equirectangular image captured by omnidirectional camera. In this script, the core is to calculate azimuth and elevation angles and convert to pixel coordinates. There is no other difference between this function and the former one.
+
+3. `auto_projection.py`
 
     **Functionality:**
 
@@ -118,7 +124,7 @@ This project provides tools for projecting 3D point cloud data onto 2D image pla
 
     - `-s`: Directory to save the output projection images (e.g., `/path/to/save_directory`).
 
-3. `video_generation.bash`
+4. `video_generation.bash`
 
     To create a video from the generated projection images, run the following script:
 
