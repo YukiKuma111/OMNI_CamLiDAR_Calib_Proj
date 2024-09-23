@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <!-- Modified by yuku -->
+    <param name="input_bag_path"        value="$(find camera_lidar_calibration)/../../data/lidar/YourRosbagName.bag" />  <!-- rosbag folder -->
+    <param name="output_pcd_path"       value="$(find camera_lidar_calibration)/../../data/pcdFiles/" />  <!-- path to save new pcd files -->
+    
+    <node pkg="camera_lidar_calibration" name="pcdTransferByTsp" type="pcdTransferByTsp" output="screen"></node>
+
+</launch>
+

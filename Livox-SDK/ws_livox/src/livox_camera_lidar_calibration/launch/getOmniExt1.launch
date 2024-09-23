@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <!-- Modified by yuku -->
+    <!-- For case 1: -->
+    <!-- <rosparam param="init_value">  [1.0, 0.0, 0.0, 0.0,
+                                    0.0, 1.0, 0.0, 0.0,
+                                    0.0, 0.0, 1.0, 0.0] </rosparam> -->
+    <!-- For case 2: -->
+    <rosparam param="init_value">  [0.0, -1.0, 0.0, 0.0,
+                                    1.0, 0.0, 0.0, 0.0,
+                                    0.0, 0.0, 1.0, 0.0] </rosparam>
+
+    <param name="intrinsic_path"    value="$(find camera_lidar_calibration)/../../data/parameters/intrinsic.txt" />  <!-- intrinsic file -->
+    <param name="extrinsic_path"    value="$(find camera_lidar_calibration)/../../data/parameters/extrinsic.txt" />  <!-- extrinsic file -->
+    <param name="input_lidar_path"  value="$(find camera_lidar_calibration)/../../data/corner_lidar.txt" />  <!-- get the lidar corner data -->
+    <param name="input_photo_path"  value="$(find camera_lidar_calibration)/../../data/corner_photo.txt" />  <!-- get the photo corner data -->
+    <param name="error_threshold"    type="int" value="12" />  <!-- the threshold of the reprojection error -->
+    <!-- Added by yuku -->
+    <param name="image_width"    type="int" value="1920" />
+    <param name="image_height"    type="int" value="960" />
+
+    <!-- Modified by yuku -->
+    <node pkg="camera_lidar_calibration" name="getOmniExt1" type="getOmniExt1" output="screen"></node>
+
+</launch>
+

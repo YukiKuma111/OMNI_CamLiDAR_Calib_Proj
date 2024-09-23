@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  
+    <!-- intrinsic file for omni -->
+    <!-- <param name="intrinsic_path"    value="$(find camera_lidar_calibration)/../../data/parameters/omni_intrinsic.txt" /> -->
+    <!-- intrinsic file for pinhole -->
+    <param name="intrinsic_path"    value="$(find camera_lidar_calibration)/../../data/parameters/intrinsic.txt" />
+    <param name="input_photo_path"  value="$(find camera_lidar_calibration)/../../data/photo/0.bmp" />  <!-- photo to find the corner -->
+    <param name="ouput_path"        value="$(find camera_lidar_calibration)/../../data/corner_photo.txt" />  <!-- file to save the photo corner -->
+    
+    <node pkg="camera_lidar_calibration" name="cornerPhoto" type="cornerPhoto" output="screen"></node>
+
+</launch>
+
