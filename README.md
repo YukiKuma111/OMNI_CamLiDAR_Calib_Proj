@@ -76,13 +76,29 @@ source devel/setup.bash
 bash create_dir.bash
 ```
 
+***
+
 ### Step2: Calibration of pinhole camera intrinsic parameters
 
+#### 2.1 Unpackage image
+
+You can custom your rosbag, save path, image topic, and output rate (output one image for every xx images) ([Modifications: 9](#9-add)).
+
+```
+cd ~/OMNI_CamLiDAR_Calib_Proj/unpackage/
+python bag2img.py -b xx.bag -s xx/xx/ -t xx/xx -r x
+```
+
+#### 2.2 Calculate intrinsic parameters
+
+##### --- _Pinhole_ camera Method 1 ---
 For a _pinhole_ camera, the projection method is typically referred to as __perspective projection__. Please follow [Step2: Calibration of camera intrinsic parameters](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/README.md#21-preparations) to calculate the camera intrinsic parameters [[Note 1](./README.md#notes)].
 
 ```
 roslaunch camera_lidar_calibration cameraCalib.launch
 ```
+
+##### --- _Pinhole_ camera Method 2 ---
 
 If you cannot guarantee that the checkerboard on the image can be recognized every time, especially if you use a __fisheye camera__, and thus an error occurs when running `cameraCalib`, it is recommended that you can use `batchCameraCalib` to solve this problem ([Modifications: 2](#2-add) contains more details).
 
@@ -94,13 +110,19 @@ It is also recommended to use a real-time function package provided by ROS for b
 
 Save the obtained intrinsic parameters and distortion correct parameters in the path _`~/OMNI_CamLiDAR_Calib_Proj/Livox-SDK/ws_livox/data/parameters/intrinsic.txt'_
 
+##### --- _Omnidirectional_ camera Method ---
+
 However, the projection models for 360-degree cameras are often equirectangular or spherical projections. Instead of projecting onto a flat plane like in the pinhole model, these cameras project the image onto a sphere or a cylinder, allowing them to capture the full scene around the camera [[Note 2](./README.md#notes)]. Thus, in the next several steps, [omni_intrinsic.txt](Livox-SDK/ws_livox/data/parameters/omni_intrinsic.txt) will be used as a default input.
+
+***
 
 ### Step3: Preparations and data collections
 
 Follow [Step3: Preparations and data collections](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/README.md#31-calibration-scene-preparation) and collect the point cloud data of the calibration scene in a relatively _empty and static environment_, with a "customMsg" format rosbag, which is required for the subsequent program.
 
 It is also acceptable to use other topics to record point clouds. Check step [step 4.3](#43-acquire-the-corner-coordinates-in-point-cloud) to get different operations.
+
+***
 
 ### Step4: Calibration data acquisition
 
@@ -129,16 +151,29 @@ If you create a `corner_photo.txt` and enter corner pixels manually, please add 
 
 #### 4.3 Acquire the corner coordinates in point cloud
 
+##### --- Method 1 ---
+
 Follow [4.3 Acquire the corner coordinates in point cloud](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/README.md#43-acquire-the-corner-coordinates-in-point-cloud) step by step, if you record point cloud data by "customMsg". Pay attention to the role of filename. This official function will merge every point cloud into one pcd file, so please make sure your environment is static.
 
 ```
 roslaunch camera_lidar_calibration pcdTransfer.launch
 ```
 
+##### --- Method 2 ---
+
 However, if you want decompress every frame and merge the point cloud into your desired scene, you can run the command below ([Modifications: 6](#6-add) contains more details):
 
 ```
 roslaunch camera_lidar_calibration pcdTransferByTsp.launch
+```
+
+##### --- Method 3 ---
+
+If your LiDAR sensor is not Livox MID-360, the following commands can help you to unpackage a rosbag to pcd files by custom rosbag name and topics([Modifications: 9](#9-add)). Please make sure your rosbag is stored under `~/OMNI_CamLiDAR_Calib_Proj/Livox-SDK/ws_livox/data/lidar/` , as well as the _type_ for point cloud data is _sensor_msgs/PointCloud2_
+
+```
+cd ~/OMNI_CamLiDAR_Calib_Proj/unpackage/
+bash bag2pcd.sh xx.bag /xx/xx
 ```
 
 Next, you can use PCL visualization program to select point coordinates:
@@ -152,6 +187,23 @@ But you can also use [CloudCompare](https://snapcraft.io/install/cloudcompare/ub
 <div align=center><img src="doc_resource/images/select_point1.png" width=350></div>
 <div align=center><img src="doc_resource/images/select_point2.png" width=350></div>
 <div align=center><img src="doc_resource/images/select_point3.png" width=350></div>
+
+How to __merge__ multiple frames to get a dense point cloud?
+
+1. Select multiple frames
+<div align=center><img src="doc_resource/images/merge1.png" width=350></div>
+
+2. Merge multiple clouds
+<div align=center><img src="doc_resource/images/merge2.png" width=350></div>
+
+3. Do __not__ generate a scalar field
+<div align=center><img src="doc_resource/images/merge3.png" width=350></div>
+
+How to __save__ a point cloud?
+<div align=center><img src="doc_resource/images/save1.png" width=350></div>
+<div align=center><img src="doc_resource/images/save2.png" width=350></div>
+
+***
 
 ### Step5: Extrinsic calculation
 
@@ -168,6 +220,8 @@ For _omnidirectional camera_ extrinsic calculation, please use the same paramete
 roslaunch camera_lidar_calibration getOmniExt1.launch
 ```
 
+***
+
 ### Step6: Results verification and related applications
 
 You can use the following command to project point cloud data on _pinhole cancamera_ image.
@@ -179,16 +233,16 @@ roslaunch camera_lidar_calibration projectCloud.launch
 Or, use the following tools:
 
 ```
-# for pinhole camera
+# for pinhole cameras
 python pinhole_img_projection.py -img xxx.png -pcd xxx.pcd -para xx/xx/ -s xxx.png
 
-# for omnidirectional camera
+# for omnidirectional cameras
 python omni_img_projection.py -img xxx.png -pcd xxx.pcd -ex xx/xx.txt -s xxx.png
 
-# for batch pinhole camera projection
+# for batch pinhole camera projections  (currently not available for omnidirectional cameras)
 python auto_projection.py -img xxx.png -pcd xxx.pcd -para xx/xx/ -s xxx.png
 
-# for creating a video from the batch projection images
+# for batch projection image video
 bash video_generation.bash
 ```
 
@@ -239,6 +293,12 @@ Change the methods of extrinsic parameters and errors,referring to formulas give
 [omni_projection](omni_projection)
 
 To projection point cloud data on both _omnidirectional camera_ or _pinhole camera_.
+
+### 9. Add
+
+[bag2img.py](unpackage/bag2img.py) and [bag2pcd.sh](unpackage/bag2pcd.sh)
+
+To unpackage the rosbag to images and pcd files by topic.
 
 ## Notes
 1. The format of the intrinsic matrix for pinhole camera is shown in the following figure.
@@ -328,10 +388,10 @@ OMNI_CamLiDAR_Calib_Proj/
 │   ├── omni_img_projection.py
 │   ├── pinhole_img_projection.py
 │   └── video_generation.bash
+├── unpackage
+│   ├── bag2img.py
+│   └── bag2pcd.sh
 └── README.md
-
-71 directories, 337 files
-
 ```
 
 ## Reference
