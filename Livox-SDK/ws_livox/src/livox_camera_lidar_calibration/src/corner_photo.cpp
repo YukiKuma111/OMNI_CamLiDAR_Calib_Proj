@@ -103,6 +103,7 @@ int main(int argc, char **argv) {
     // cv::namedWindow("source", CV_WINDOW_KEEPRATIO);
     cv::namedWindow("source");
     cv::imshow("source", src_img);
+    cv::imwrite(photo_path + "_dedistorted.png", src_img);   // added by yuku
     cv::waitKey(0);
     
     cv::destroyWindow("source");

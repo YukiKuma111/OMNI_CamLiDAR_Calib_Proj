@@ -145,6 +145,8 @@ roslaunch camera_lidar_calibration cornerPhoto.launch
 If there is no UI interface opened, you can download [mtPaint](https://cn.linux-console.net/?p=16764) to find corners pixels. For instance, this pixel is located at (1898, 949).
 <div align=center><img src="doc_resource/images/pixel_position.png" height=241></div>
 
+<font color="red">Tip:</font>  If the point selection window does not pop up, please use mtPaint to open the image with the `'_dedistorted'` suffix instead of the original image to select pixels!
+
 The default save path for photo corner result is _`~/OMNI_CamLiDAR_Calib_Proj/Livox-SDK/ws_livox/data/corner_photo.txt`_. 
 
 If you create a `corner_photo.txt` and enter corner pixels manually, please add __8 spaces__ between two digits [[Note 3](#notes)].
@@ -251,17 +253,17 @@ bash video_generation.bash
 The following modifications have been made to the original code. You can also search characters `yuku` for more details.
 
 ### 1. Fix
-[`CMakeLists.txt`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
+[CMakeLists.txt](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
 
 Error: PCL requires C++14 or above. Referece to [Solution](https://blog.csdn.net/handily_1/article/details/122421305).
 
 ### 2. Add
-[`batchCameraCalib.cpp`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/batchCameraCalib.cpp) and [`batchCameraCalib.launch`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/launch/batchCameraCalib.launch), then modify [`CMakeLists.txt`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
+[batchCameraCalib.cpp](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/batchCameraCalib.cpp) and [batchCameraCalib.launch](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/launch/batchCameraCalib.launch), then modify [CMakeLists.txt](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
 
 The original `cameraCalib` will exit the program when it encounters a situation where the chessboard cannot be detected, while this `batchCameraCalib` can skip these invalid image data and continue to retrieve and calculate subsequent content.
 
 ### 3. Fix
-[`cam_lid_external1.cpp`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/cam_lid_external1.cpp) and [`cam_lid_external2.cpp`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/cam_lid_external2.cpp)
+[cam_lid_external1.cpp](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/cam_lid_external1.cpp) and [cam_lid_external2.cpp](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/cam_lid_external2.cpp)
 
 Error: ‘LocalParameterization’ is not a member of ‘ceres’. Referece to [Solution](https://blog.csdn.net/2301_78593267/article/details/135310726).
 
@@ -278,13 +280,13 @@ For __Livox MID-360__, it uses "livox_ros_driver2/CustomMsg" as the message titl
 
 ### 6. Add
 
-[pcdTransferByTsp.cpp](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/pcdTransferByTsp.cpp), [pcdTransferByTsp.launch](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/launch/pcdTransferByTsp.launch), then modify [`CMakeLists.txt`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
+[pcdTransferByTsp.cpp](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/pcdTransferByTsp.cpp), [pcdTransferByTsp.launch](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/launch/pcdTransferByTsp.launch), then modify [CMakeLists.txt](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
 
 The original pcdTransfer will merge every point into one pcd file. Whereas, this pcdTransferByTsp will save each point cloud frame according to the timestamp.
 
 ### 7. Add
 
-[omni_cam_lid_external1.cpp](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/omni_cam_lid_external1.cpp), [result_verify.h](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/result_verify.h), [common.h](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/common.h), [getOmniExt1.launch](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/launch/getOmniExt1.launch), then modify [`CMakeLists.txt`](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
+[omni_cam_lid_external1.cpp](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/omni_cam_lid_external1.cpp), [result_verify.h](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/result_verify.h), [common.h](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/common.h), [getOmniExt1.launch](Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/launch/getOmniExt1.launch), then modify [CMakeLists.txt](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/CMakeLists.txt)
 
 Change the methods of extrinsic parameters and errors,referring to formulas given in [Note 2](#notes).
 
@@ -299,6 +301,12 @@ To projection point cloud data on both _omnidirectional camera_ or _pinhole came
 [bag2img.py](unpackage/bag2img.py) and [bag2pcd.sh](unpackage/bag2pcd.sh)
 
 To unpackage the rosbag to images and pcd files by topic.
+
+### 10. Modify
+
+[corner_photo.cpp](./Livox-SDK/ws_livox/src/livox_camera_lidar_calibration/src/corner_photo.cpp)
+
+The bug that the point selection window cannot be opened is avoided by saving the dedistorted image function.
 
 ## Notes
 1. The format of the intrinsic matrix for pinhole camera is shown in the following figure.
